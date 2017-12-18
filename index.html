@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TEST</title>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/weui.css">
+</head>
+
+<body>
+    <div class="wrap index_page" id="index-box">
+        <div class="page1" v-show="pageStatus.onePage">
+            
+        </div>
+        <!-- 未绑定银行卡 -->
+        <div class="goBind model" v-show="status.isBind">
+            <div class="modelBox">
+                <span class="close" @click="status.isBind = false">
+                    <img src="images/close.png" alt="">
+                </span>
+                <div class="whiteBox">
+                    <span class="bq_img"><img src="images/cry.png" alt=""></span>
+                    <p>您还未绑定我行微信银行哦，<br>快去绑定吧！</p>
+                    <a href="javascript:;">去绑定</a>
+                </div>
+
+            </div>
+        </div>
+        <!-- 图片上传中 -->
+        <div id="loadingToast" v-show="alertModel.loading">
+            <div class="weui-mask_transparent"></div>
+            <div class="weui-toast">
+                <i class="weui-loading weui-icon_toast"></i>
+                <p class="weui-toast__content" v-html="loadingTxt"></p>
+            </div>
+        </div>
+        <!--按钮提示框-->
+        <!--BEGIN dialog2-->
+        <div class="js_dialog" id="iosDialog2" v-show="alertModel.dialog">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__bd">{{dialogTxt}}</div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" @click="alertModel.dialog = false">知道了</a>
+                </div>
+            </div>
+        </div>
+        <!-- 提示框，1000消失 -->
+        <div class="tipBox" v-show="tipModel.tipStatus">
+            <div class="tibBox_inner">
+                <p v-html="tipModel.tipTxt"></p>
+            </div>
+        </div>
+    </div>
+    <script src="js/zepto.min.js"></script>
+    <script type="text/javascript">
+        var basep = "images/", //图片目录
+            preLoadSource = [ //背景资源
+
+            ];
+    </script>
+    <script src="js/loading.js"></script>
+    <script src="js/vue.min.js"></script>
+    <script>
+        //加载资源数组必须在loading之前进行配置
+        var isComing = 0;  //0代表false 表示没有参加过答题。 1为true表示已参加过答题 , 2为已绑定，但未答题
+        $(function () {
+            new Vue({
+                el: "#index-box",
+                data: {
+                    linkHref:{
+                        bind:'http://wx.xhwxpos.com/bank_gift/index.php?m=Wap&c=Index&a=ajax_get_status&debug=1',  
+                        upload:'http://wx.xhwxpos.com/bank_gift/index.php?m=Wap&c=Index&a=ajax_uploadfile&debug=1',
+                        lottery:'http://wx.xhwxpos.com/bank_gift/index.php?m=Wap&c=Index&a=ajax_lottery&debug=1',
+                        mobileSub:'http://wx.xhwxpos.com/bank_gift/index.php?m=Wap&c=Index&a=ajax_commit_mobile&debug=1',
+                        redPack:'http://wx.xhwxpos.com/bank_gift/index.php?m=Wap&c=Index&a=ajax_draw&debug=1'
+                    },
+                    tipModel: {
+                        tipStatus: false, //提示框状态
+                        tipTxt: ''
+                    },
+                    comingState:false,
+                    alertModel: {
+                        lotterySuccess: false,  //中奖弹框
+                        lotteryShow: false,     //中奖展示弹框
+                        loading:false,          //上传弹框
+                        dialog:false,           //带按钮的提示框
+                        more:false,             //查看更多弹框
+                        face:false,             //颜值弹框
+                        share:false,            //分享到朋友圈弹框
+                        info:false,             //介绍弹框
+                        phoneShow:true,         //手机号码弹框
+                        
+                    },
+                    dialogTxt:'',           //提示语
+                    loadingTxt:'',
+                    infoData: {  //个人信息
+                        isBind: null,        //是否绑定   0未绑定  1绑定
+                        isTransfer: null,    //是否转账
+                        isDraw: null,        //是否领奖
+                        isFace: null,        //是否已进行过人脸识别
+                        isPrize: null,       //是否中奖
+                        isPrizeName: null,   //中奖礼物名称
+                        prizeLevel: null,    //中的第几等奖
+                    },
+                    pageStatus: {   //page显示
+                        onePage: true,
+                        twoPage: false,
+                        threePage: false,
+                        fourPage:false
+                    },
+                    status: {
+                        isBind: false,   //绑定弹框状态
+
+                    },
+                    base64:null,
+                    face: {   //人脸识别参数
+                        num: 0,
+                        result: false,
+                        index:0,    //颜值弹框的index
+                        txt:["","不好意思哦<br>没有检测到您的人脸","您的颜值不足<br>速去加颜值","您已获取过照片颜值分","您这周颜值已达到顶峰<br>下周再来吧"],    //颜值弹框提示语
+                        img:["","images/cry.png","images/cry.png","images/tangle.png","images/smile.png"]
+                    },
+                    randomNum: null,
+                    classPage: [
+                        ["one", "two", "three"],
+                        ["one", "three", "two"],
+                        ["two", "one", "three"],
+                        ["two", "three", "one"],
+                        ["three", "one", "two"],
+                        ["three", "two", "one"]
+                    ],
+                    lottery: {
+                        start: false,      //未抽奖
+                        num: null,         //默认为不中奖，1为迪士尼，2为咖啡券，3为现金红包
+                        phone:null,        //中奖手机号
+                        balance:null,      //余额
+                    },
+                    gift:{
+                        num:3,
+                        money:null,
+                        img:['','images/win_1.png','images/win_2.png','images/win_3.png'],
+                        txt:['','迪士尼电子门票<br>将发送至该手机号码','costa咖啡券<br>将发送至该手机号码','已存入您的微信钱包']
+                    },
+                    openRed:false
+                },
+                methods: {
+                    startHandle: function () {      //开始游戏
+                        var This = this;
+                        /*未绑定*/
+                        if (This.infoData.isBind == 0) {
+                            This.status.isBind = true;
+                        } else {
+                            This.pageStatus.twoPage = true;
+                            This.pageStatus.onePage = false;
+                        }
+                        /*已绑定，已人脸识别*/
+                        if (This.infoData.isBind == 1 && This.infoData.isFace == 1) {
+                            This.pageStatus.onePage = false;
+                            This.pageStatus.threePage = true;
+                        }
+                    },
+                    lotteryHandle: function () {   //点击去抽奖
+                        this.pageStatus.twoPage = false;
+                        this.pageStatus.threePage = true;
+                    },
+                    startLottery: function () {    //点击开始抽奖
+                        var This = this;
+                        if(this.face.score < 25){
+                        	//This.showDialog('您的余额不够，不能抽奖');
+                            This.alertModel.face = true;
+                            This.face.index = 2;
+                        	return false;
+                        }
+                        this.lottery.start = true;
+                        $.ajax({
+                            url: This.linkHref.lottery,
+                            dataType: 'json',
+                            type: 'post',
+                            data: {},
+                            async: true,
+                            success: function (res) {
+                                if (res.sta == 0) {   //抽奖成功
+                                    setTimeout(function () {
+                                        This.lottery.num = This.infoData.prizeLevel = res.prize_level;  //中几等奖
+                                        // This.lottery.balance = 100;
+                                        This.infoData.isPrize = res.is_prize;
+                                        This.gift.money = res.money;
+                                        This.lottery.start = false;
+                                        if (This.lottery.num == 0) {   //没中奖，随机结果
+                                            This.randomNum = This.randomHandle(5, 0);
+                                        }    
+                                        This.lotteryResult();                                    
+                                        console.log("恭喜您中奖了");
+                                    }, 1000)
+
+                                } else {     //不正常                                    
+                                    This.showDialog(res.msg);
+                                    This.lottery.start = false;
+                                    This.randomNum = This.randomHandle(5, 0);
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(XMLHttpRequest)
+                            }
+                        })    
+                    },
+                    lotteryResult(){  //中奖结果
+                        var This = this;
+                        setTimeout(function(){
+                            This.alertModel.lotterySuccess = true;
+                        },300)
+
+                    },
+                    showPreview(source){  //上传头像转base64
+                        var This = this;
+                        this.alertModel.loading=true;
+                        var file = null;
+                        if(source == 1){
+                            file = $("#file").get(0).files[0];  
+                        }else{
+                            file = $("#file2").get(0).files[0];  
+                            This.alertModel.face = false;
+                        }
+                        if (!/image\/\w+/.test(file.type)) {
+                            This.showDialog('上传文件必须是图片');
+                            return false;
+                        }
+                        if(window.FileReader) {  
+                            var fr = new FileReader();  
+                            fr.onloadend = function(e) {                                 
+                                // document.getElementById("portrait").src = e.target.result;
+                                This.base64 = e.target.result;                                
+                                This.uploadImg()
+                            };  
+                            fr.readAsDataURL(file);  
+                        }  
+                    }, 
+                    uploadImg(){    //上传照片
+                        var This = this;
+                        $.ajax({
+                            url: This.linkHref.upload,
+                            dataType: 'json',
+                            type: 'post',
+                            data: {
+                                "base64":This.base64
+                            },
+                            async: true,
+                            success: function (res) {
+                                This.alertModel.loading=false; 
+
+                                if (res.status == 0) {   //上传识别正常
+                                    document.getElementById("portrait").src = This.base64;
+                                    $('.photo2').animate({
+                                                    top: '14.7rem'
+                                                }, 1000)
+                                    $('.photo').animate({
+                                                    top: '-13rem'
+                                                }, 1000);
+                                    This.face = {
+                                        num: res.score,
+                                        result: true
+                                    }
+
+                                } else {     //不正常
+
+                                    // This.showDialog('检测不到人脸，请重新上传');
+                                    This.alertModel.face = true;
+                                    This.face.index = 1;
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(XMLHttpRequest)
+                            }
+                        })
+                    },
+                    wxUpLoadImg(){
+                        wx.chooseImage({
+                            count: 1,
+                            sizeType:['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                            sourceType: ['album', 'camera'],     // 可以指定来源是相册还是相机，默认二者都有
+                            success:function(res){
+                                images.localId = res.localIds;   // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                                var i = 0, length = images.localId.length;
+                                document.getElementById('show615').src = images.localId;
+                                var wxUpload = function() {
+                                    wx.uploadImage({
+                                        localId: images.localId[i], // 需要上传的图片的本地ID，由chooseImage接口获得
+                                        isShowProgressTips: 1, // 默认为1，显示进度提示
+                                        success: function (res) {
+                                            alert(JSON.stringify(res))
+                                            /*i++;
+                                            //将上传成功后的serverId保存到serverid
+                                            images.serverId.push(res.serverId);
+                                            //(serverId 即 media_id,公众号此后可根据该media_id来获取多媒体)将上传的图片通过AJAX远程提交给php下载到本地服务器
+                                            var url = "./index.php?i=3&c=entry&type=image&do=uploads&m=dayu_form&serverId=" + res.serverId + "&localId=" + i;
+                                            $.post(url, function(dat){
+                                                var dat = eval("("+dat+")");
+                                                $.toast(dat.message, "success");
+                                                $('input[name="field_615_"]').val(dat.path);
+                                            });
+                                            if(i < length){
+                                                wxUpload();
+                                            }*/
+                                        },
+                                        fail: function (res) {
+                                            alert(JSON.stringify(res));
+                                        }
+                                    });
+                                    
+                                };
+                                wxUpload();
+                            }
+                        });
+                    },
+                    validate(){   //验证手机号码是否正确
+                        var This = this;
+                        var validate = this.isPhone(this.lottery.phone);
+                        if(!validate){
+                            This.showDialog('手机号码格式不正确');
+                            return false;
+                        };
+                        this.alertModel.lotterySuccess = false;
+                        this.alertModel.phoneShow = true;
+                    },
+                    backMo:function(){
+                        this.alertModel.phoneShow = false;
+                        this.alertModel.lotterySuccess = true
+                    },
+                    submitMobileHandle: function () {
+                        var This = this;
+                        let waitNum=15;
+                        This.alertModel.loading = true;
+                        
+                        var TimerWait = setTimeout(function(){
+                            waitNum -- ;
+                            console.log(waitNum)
+                            if(waitNum < 0){
+                                clearTimeout(TimerWait)
+                            }else{
+                                setTimeout(arguments.callee,1000);
+                                This.loadingTxt="正在为您生成券码<br/>请勿关闭页面<br/>"+waitNum+"s";
+                            }
+                        },1000)
+                        
+                        $.ajax({
+                            url:This.linkHref.mobileSub,
+                            dataType: 'json',
+                            type: 'post',
+                            data: {
+                                "mobile":This.lottery.phone
+                            },
+                            async: true,
+                            success: function (res) {
+                                if (res.sta == 0) {   //提交成功
+                                    This.lottery.phone = '';
+                                    This.gift.num = res.gift;
+                                    This.alertModel.phoneShow = false;
+                                    This.alertModel.lotteryShow = true;
+                                } else {     //不正常
+                                    This.showDialog(res.msg)
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(XMLHttpRequest)
+                            }
+                        })
+                    },
+                    rewardRedPack(){   //开红包
+                        var This = this;
+                        this.openRed = true;
+                        $.ajax({
+                            url: This.linkHref.redPack,
+                            dataType: 'json',
+                            type: 'post',
+                            data: {},
+                            async: true,
+                            success: function (res) {
+                                This.openRed = false;
+                                res.sta = 0;
+                                if (res.sta == 0) {   //领取成功
+                                    This.gift.num = 3;
+                                    // This.gift.money = 100;
+                                    This.alertModel.lotterySuccess = false;
+                                    This.alertModel.lotteryShow = true;
+                                } else {     //不正常
+                                    This.showDialog(res.msg)
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(XMLHttpRequest)
+                            }
+                        })
+                    },
+                    randomHandle: function (x, y) {
+                        // x是随机数上限，y是随机数下限
+                        let rand = parseInt(Math.random() * (x - y + 1) + y);
+                        return rand;
+                    },
+                    getInfo: function () {
+                        var This = this;
+                        $.ajax({
+                            url: This.linkHref.bind,
+                            dataType: 'json',
+                            type: 'post',
+                            data: {},
+                            async: true,
+                            success: function (res) {
+                                if (res.sta == 0) {   //正常
+                                    var result = res.data;
+                                    This.infoData.isBind = result.is_binding=1;
+                                    This.infoData.isDraw = result.is_draw ;
+                                    This.infoData.isFace = result.is_face=1;
+                                    This.infoData.isPrize = result.is_prize;
+                                    This.infoData.isTransfer = result.is_transfer;
+                                    This.infoData.prizeLevel = result.prize_level;  //此数据后台未返回       
+                                    // This.lottery.balance = result.balance;         
+                                    This.face.score = result.score;                 //余额   
+                                    This.gift.money = result.money;                 //如果是中奖红包的话，中奖金额                   
+
+                                    /*已中奖，未领奖*/
+                                    if (This.infoData.isPrize == 1 && This.infoData.isDraw == 0) {
+                                        This.alertModel.lotterySuccess = true;
+                                    }
+
+                                } else {     //不正常
+                                    This.showDialog(res.msg)
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(XMLHttpRequest)
+                            }
+                        })
+                    },
+                    sureHandle(){
+                        this.alertModel.more = true;
+                        this.alertModel.face = false;
+                    },
+                    isPhone : function(str) {  //判断是否是正确的手机
+                        if(typeof str === 'number'){
+                            str = str.toString();
+                        }
+                        return /^0?1[3|4|5|7|8][0-9]\d{8}$/.test(str);
+                    },
+                    showDialog(msg){
+                        this.alertModel.dialog = true;
+                        this.dialogTxt = msg
+                    },
+                    setLSData:function(key, value){
+                        localStorage.setItem(key, JSON.stringify(value));
+                    },
+                    getLSData:function(key){
+                        return JSON.parse(localStorage.getItem(key));
+                    },
+                    init: function () {
+                        var This = this;
+                        this.getInfo();  //获取个人信息
+                    }
+                },
+                mounted: function () {
+                    this.init();
+                    var localData = this.getLSData('isComeIn');
+                    if(!localData){   //不存在
+                        this.comingState = true;
+                        this.setLSData('isComeIn',1);
+                    }else{
+                        this.comingState = false;
+                    }
+
+                }
+            })
+        })
+    </script>
+
+</body>
+
+</html>
