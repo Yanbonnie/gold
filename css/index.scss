@@ -9,6 +9,8 @@ html,body{
     max-width: 750px;  
     height: 100%;
     margin: 0 auto;
+    min-height:REM(1039);
+    position: relative;
 }
 img{
     display: block;
@@ -35,12 +37,120 @@ img{
     .page1{
         width: 100%;
         height:100%;
-        background: url($URL+'index_bg.jpg') no-repeat #dcf1fc center -35px;
+        background: url($URL+'index_bg.jpg') no-repeat #f97819 ;
+        @include prefixer(background-size,100% 100%);
+        position: absolute;
+        left: 0;
+        top: 0;
+        // min-height: 43rem;
+        height: 100%;
+        .pageBox{
+            width: 80%;
+            margin: REM(120) auto 0;
+            background: $WHITE;
+            padding: 5%;
+            border-radius: REM(20);
+            .title{
+                margin-top: REM(-100);
+            }
+            P{
+                font-size: REM(28);
+                color: $BLACK;
+                &.tip{
+                    text-align: center;
+                    font-size: REM(24);
+                    color: #f97819;
+                    padding: REM(20) 0 0;
+                    position: relative;
+                    &::before{
+                        position: absolute;
+                        width: 6px;
+                        height: 6px;
+                        content: '.';
+                        font-size: 0;
+                        background: #f97819;
+                        left: 0;
+                        top: REM(30);
+                        @include prefixer(border-radius,REM(50));
+                    }
+                }
+            }
+            a{
+                display: block;
+                text-align: center;
+                line-height: REM(60);
+                margin: REM(40) auto;
+                background: #f97919;
+                width: REM(250);
+                font-size: REM(30);
+                color: $WHITE;
+                @include prefixer(border-radius,REM(50))
+
+            }
+        }
+    }
+    .page2{
+        width: 100%;
+        height:100%;
+        background: url($URL+'index.jpg') no-repeat center top #f8871b;
         @include prefixer(background-size,100% auto);
         position: absolute;
         left: 0;
         top: 0;
-        min-height: 46rem;
+        height: 100%;
+        .logo{
+            width:REM(271);
+            position: absolute;
+            top: REM(30);
+            left: REM(30);
+        }
+        .title{
+            width: REM(500);
+            position: absolute;
+            left: 50%;
+            top: REM(60);
+            margin-left: REMTWO(500);
+        }
+        p{
+            position: absolute;
+            top: REM(900);
+            color: #84200f;
+            font-size: REM(26);
+            font-weight: bold;
+            width: 90%;
+            left: 5%;
+        }
+        .btn-box{
+            width: 100%;
+            top: REM(1050);
+            position: absolute;
+            a{
+                width: REM(247);
+                float: left;
+                margin-left: REM(50);
+                &:nth-child(2){
+                    float: right;
+                    margin-right: REM(50);
+                }
+            }
+        }
+    }
+    .page3{
+        width: 100%;
+        height:100%;
+        background: url($URL+'index_bg2.jpg') no-repeat center top #f8871b;
+        @include prefixer(background-size,100% auto);
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        .chai{
+            width: 100%;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            @include prefixer(transform,translateY(-60%));
+        }
     }
 }
 
@@ -55,72 +165,180 @@ img{
     background: rgba(0,0,0,0.8);
     z-index: 100;
     .modelBox{
-        width:REM(500);
-        padding: REM(30);
+        width:REM(600);
+        // padding: REM(30);
         position: absolute;
         top: 50%;
         left: 50%;
         @include prefixer(transform,translate(-50%,-50%));
-        background: #3aa9f5;
+        background:$WHITE;
         @include prefixer(border-radius,REM(20));
+        // overflow: hidden;
+        // .close{
+        //     width:REM(69);
+        //     height: REM(69);
+        //     position: absolute;
+        //     top: -5rem;
+        //     right: 0;
+        //     &::before{
+        //         height: 2.6rem;
+        //         content: '.';
+        //         font-size: 0;
+        //         width: REM(2);
+        //         background: #ffffff;
+        //         left: 50%;
+        //         top: REM(69);
+        //         display: block;
+        //         position: absolute;
+        //     }
+        // }
         .close{
             width:REM(69);
             height: REM(69);
             position: absolute;
-            top: -5rem;
-            right: 0;
-            &::before{
-                height: 2.6rem;
-                content: '.';
-                font-size: 0;
-                width: REM(2);
-                background: #ffffff;
-                left: 50%;
-                top: REM(69);
-                display: block;
-                position: absolute;
+            bottom: REM(-130);
+            left: 50%;
+            margin-left: REMTWO(69);
+        }
+        .modelHeader{
+            background: #fe9d1b;
+            height: REM(80);
+            @include prefixer(border-top-left-radius, REM(20));
+            @include prefixer(border-top-right-radius, REM(20));
+        }
+        .modelBody{
+            p{
+                color: $BLACK;
+                font-size: REM(30);
+                text-align: center;
             }
         }
-        .whiteBox{
-            background: #fff;
-            padding: REM(40) 0;
-            @include prefixer(border-radius,REM(20));
-            .bq_img{
-                width: REM(182);
+        .modelFooter{
+            padding: REM(30) 0;
+            background: #f97919;
+            @include prefixer(border-bottom-left-radius, REM(20));
+            @include prefixer(border-bottom-right-radius, REM(20));
+            .submit{
+                width: REM(250);
                 display: block;
                 margin: 0 auto;
-                padding-bottom: REM(40);
+                img{
+                    width: 100%;
+                    display: block;
+                }
             }
-            P{
-                font-size: REM(24);
-                text-align: center;
-                color: #000;
-            }
-            a{
+            .back{
                 width: REM(200);
-                height: REM(60);
-                line-height: REM(60);
+                margin-left: REM(60);
+                float: left;
+                img{
+                    width: 100%;
+                    display: block;
+                }
+            }
+            .sure{
+                width: REM(200);
+                float: right;
+                margin-right: REM(60);
+                img{
+                    width: 100%;
+                    display: block;
+                }
+            }
+            
+        }
+    }
+}
+//京东电子，篮球中奖弹框
+.giftModel{
+    .modelBox{
+        .modelHeader{
+            background: #fe9d1b;
+            height: REM(80);
+        }
+        .modelBody{
+            .giftImg{
+                width:REM(437);
+                margin: REM(-80) auto 0;
+            }
+            .line{
+                width: REM(222);
+                margin: REM(20) auto;
+            }
+            p{
                 text-align: center;
-                background: $orange;
-                display: block;
-                margin: REM(30) auto 0;
-                font-size: REM(24);
-                color: #ffffff;
-                @include prefixer(border-radius,REM(10));
-                
+                font-size: REM(30);
+                color: $BLACK;
+               &.txt{                   
+                   margin-top: REM(-50);
+               } 
+               input{
+                   width: REM(450);
+                   height: REM(60);
+                   text-indent: REM(30);
+                   line-height: REM(60);
+                   border: 1px #b3b3b3 solid;
+                   margin: REM(20) auto REM(30);
+                   @include prefixer(border-radius,REM(50));
+               }
             }
         }
-        a.submit{
-            width: REM(200);
-            height: REM(60);
-            line-height: REM(60);
-            text-align: center;
-            background: $orange;
-            display: block;
-            margin: REM(30) auto 0;
-            font-size: REM(24);
-            color: #ffffff;
-            @include prefixer(border-radius,REM(10));
+        .modelFooter{
+            padding: REM(30) 0;
+            background: #f97919;
+            .submit{
+                width: REM(250);
+                display: block;
+                margin: 0 auto;
+                img{
+                    width: 100%;
+                    display: block;
+                }
+            }
+        }
+    }
+}
+//结果弹框
+.resultModel{
+    .modelBox{
+        .modelBody{
+            .giftImg{
+                width:REM(422);
+                margin: REM(30) auto 0;
+            }
+            p{
+                text-align: center;
+                font-size: REM(30);
+                color: $BLACK;
+                padding-bottom: REM(30);
+               
+            }
+        }
+        .modelFooter{
+            p{
+                text-align: center;
+                font-size: REM(30);
+                color: $WHITE;
+            }
+        }
+    }
+}
+//确认手机弹框
+.phoneModel{
+    .modelBox{
+        .modelBody{
+            img{
+                width: REM(176);
+                display: block;
+                margin: REM(50) auto;
+            }
+            h3{
+                font-size: REM(38);
+                color: #f97c19;
+                text-align: center;
+                line-height: REM(60);
+                padding-bottom: REM(30);
+            }
         }
     }
 }
@@ -140,8 +358,8 @@ img{
     z-index: 1001;
     background:rgba(255,255,255,0);
     .tibBox_inner{
-        width: REM(300);
-        height: REM(200);
+        max-width: REM(500);
+        // height: REM(200);
         background: rgba(0,0,0,0.5);
         position:fixed;
         top: 50%;
@@ -153,7 +371,7 @@ img{
             line-height: REM(45);
             font-size: REM(30);
             color: #fff;
-            padding-top:REM(50);
+            padding:REM(50);
             text-align: center;
         }
     }

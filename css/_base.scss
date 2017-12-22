@@ -93,8 +93,8 @@ $flexMid:                     true !default; //用于ie10 -ms前缀
 //全局变量
 $URL:                         "../images/";//url路径前缀
 $REM:            24;//rem unit
-$COLOR:          #000000;//font color
-$BGCOLOR:        #ffffff;//bg color
+$BLACK:          #000000;//font color
+$WHITE:        #ffffff;//bg color
 @function REM($n){
     @return $n/$REM*(64/75)*1rem;
 }
