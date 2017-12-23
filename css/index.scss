@@ -257,9 +257,23 @@ img{
             height: REM(80);
         }
         .modelBody{
+            position: relative;
             .giftImg{
                 width:REM(437);
                 margin: REM(-80) auto 0;
+            }
+            .redpackImg{
+                width: 100%;
+                margin: 0 auto;
+            }
+            .openRed{
+                width: REM(139);
+                height: REM(139);
+                position: absolute;
+                top: 58%;
+                left: 50%;
+                margin-top: REMTWO(139);
+                margin-left: REMTWO(139);
             }
             .line{
                 width: REM(222);
@@ -298,6 +312,57 @@ img{
         }
     }
 }
+
+.kai_active{
+    animation: rotate-x 0.5s infinite;
+    -moz-animation: rotate-x 0.5s infinite;  /* Firefox */
+    -webkit-animation: rotate-x 0.5s infinite;   /* Safari 和 Chrome */
+    -o-animation: rotate-x 0.5s infinite;    /* Opera */
+}
+@keyframes rotate-x {
+    50% {
+        transform: scaleX(0);
+    }
+    100% {
+        transform: scaleX(1);
+    }
+}
+/*  IE  */
+@-ms-keyframes rotate-x {
+    50% {
+        -ms-transform: scaleX(0);
+    }
+    100% {
+        -ms-transform: scaleX(1);
+    }
+}
+/* Safari and Chrome*/
+@-webkit-keyframes rotate-x {
+    50% {
+        -webkit-transform: scaleX(0);
+    }
+    100% {
+        -webkit-transform: scaleX(1);
+    }
+}
+/* Firefox  */
+@-moz-keyframes rotate-x {
+    50% {
+        -moz-transform: scaleX(0);
+    }
+    100% {
+        -moz-transform: scaleX(1);
+    }
+}
+/*  Opera  */
+@-o-keyframes rotate-x {
+    50% {
+        -o-transform: scaleX(0);
+    }
+    100% {
+        -o-transform: scaleX(1);
+    }
+}
 //结果弹框
 .resultModel{
     .modelBox{
@@ -311,6 +376,9 @@ img{
                 font-size: REM(30);
                 color: $BLACK;
                 padding-bottom: REM(30);
+                &.txt{
+                    padding: REM(20) 0 REM(10);
+                }
                
             }
         }
@@ -321,6 +389,36 @@ img{
                 color: $WHITE;
             }
         }
+    }
+    &.rewardModelRed{
+        
+        .modelBox{
+            width: REM(550);
+            @include prefixer(border-radius,0);
+            background: none;
+            .modelHeader,.modelFooter{
+                display: none;
+            }
+            .modelMoney{
+                width: 100%;
+                position: relative;
+                p{
+                    position:absolute;
+                    width: 100%;
+                    top: REM(300);
+                    left: 0;
+                    text-align: center;
+                    font-size: REM(50);
+                    color: $BLACK;
+                    b{
+                        font-size: REM(24);
+                        line-height: REM(95);
+                        margin-left: 10px;
+                    }
+                }
+            }
+        }
+        
     }
 }
 //确认手机弹框
@@ -338,6 +436,24 @@ img{
                 text-align: center;
                 line-height: REM(60);
                 padding-bottom: REM(30);
+            }
+        }
+    }
+}
+
+//提示弹框
+.sorryModel{
+    .modelBox{
+        .img1{
+            width: REM(404);
+            margin: REM(30) auto;
+        }
+        p{
+            font-size: REM(26);
+            padding-bottom: REM(30);
+            span{
+                font-size: REM(40);
+                color: #f97a19;
             }
         }
     }

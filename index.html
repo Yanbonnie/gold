@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
@@ -9,7 +8,6 @@
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/weui.css">
 </head>
-
 <body>
     <div class="wrap index_page" id="index-box"> 
         <!-- 活动规则 -->
@@ -40,25 +38,26 @@
         </div>
 
         <!-- 京东电子卡和篮球奖品弹框 -->
-        <div class="model giftModel">
+        <div class="model giftModel" v-show="model.gift">
             <div class="modelBox">
                 <div class="modelHeader"></div>
                 <div class="modelBody">
-                    <img src="images/gift1.png" class="giftImg" alt=""> <!--images/gift2.png-->
+                    <img :src="gift.imgSrc[gift.num]"  :class="[gift.num == 2 ? 'redpackImg':'giftImg']" alt=""> <!--images/gift2.png-->
+                    <img class="openRed" v-if="gift.num == 2" src="images/kai.png" :class="[open ? 'kai_active':'']" alt=""> <!--kai_active-->
                     <img src="images/line.png" class="line" alt="">
                     <p class="txt">恭喜您</p>
-                    <p>获得CBA明星签名篮球</p> <!--获得京东电子券-->
-                    <p><input type="text" name="" id=""></p>
+                    <p>{{gift.txt[gift.num]}}</p> <!--获得京东电子券-->
+                    <p v-show="gift.num != 2"><input type="text" name="" id="" v-model="gift.phone"></p>
                 </div>
                 <div class="modelFooter">
-                    <span class="submit">
+                    <span class="submit" v-show="gift.num != 2">
                         <img src="images/submit.png"  alt="">
                     </span>                    
                 </div>
             </div>
         </div>        
         <!-- 确认电话号码弹框 -->
-        <div class="model phoneModel">
+        <div class="model phoneModel" v-show="model.phone">
             <div class="modelBox">
                 <div class="modelHeader"></div>
                 <div class="modelBody">
@@ -76,20 +75,70 @@
                 </div>
             </div>
         </div>
-        <!-- 京东电子卡和篮球奖品结果弹框 -->
-        <div class="model resultModel">
+        <!-- 奖品结果弹框 -->
+        <div class="model resultModel" v-show="model.result" :class="[gift.num == 2 ? 'rewardModelRed' : '']"> 
             <div class="modelBox">
                 <i class="close"><img src="images/close.png" alt=""></i>
                 <div class="modelHeader"></div>
-                <div class="modelBody">
-                    <img src="images/result_gift.png" class="giftImg" alt=""> <!--images/gift2.png-->
-                    <p>京东电子券<br>将发送至该手机号码</p>
+                <div class="modelBody" v-if="gift.num != 2">
+                    <img :src="gift.resultSrc[gift.num]" class="giftImg" alt=""> <!--images/gift2.png-->
+                    <p class="txt" v-html="gift.resultTxt[gift.num]"></p>
+                    <p v-if="gift.num == 0">将发送至该{{gift.phone}}号码</p>
+                    <p v-if="gift.num == 1">我们会与该{{gift.phone}}联系，<br/>请保持手机通畅</p>
+                </div>
+                <div class="modelMoney" v-else>
+                    <img :src="gift.resultSrc[gift.num]" alt=""> <!--images/gift2.png-->
+                    <p>{{gift.money}}<b>元</b></p>
                 </div>
                 <div class="modelFooter">
                     <p>注意信息查收，如有疑问<br>请拨打客服电话：0571-96527</p>                    
                 </div>
             </div>
         </div>
+        <!-- 抱歉弹框 -->
+        <div class="model sorryModel" v-show="model.sorry">
+            <div class="modelBox">
+                <!-- <i class="close"><img src="images/close.png" alt=""></i> -->
+                <div class="modelHeader"></div>
+                <div class="modelBody">
+                    <img class="img1" v-if="!sorry.num" src="images/sorry_1.png" alt="">
+                    <img class="img1" v-if="sorry.num" src="images/sorry_2.png" alt="">
+                    <div>
+                        <p v-html="sorry.txt[sorry.num]"></p>
+                    </div>
+                </div>
+                <div class="modelFooter clf">
+                    <div v-if="sorry.num == 1 || sorry.num == 3 || sorry.num == 5">
+                        <a href="javascript:;" class="submit"><img src="images/sure_close.png" alt=""></a>
+                    </div>
+                    <div v-if="sorry.num == 2">
+                        <a href="javascript:;" class="submit"><img src="images/go_sign.png" alt=""></a>
+                    </div>    
+                    <div v-if="sorry.num == 4">
+                            <span class="back">
+                                <img src="images/refuse.png"  alt="">
+                            </span>
+                            <span class="sure">
+                                <img src="images/jihuo.png"  alt="">
+                            </span> 
+                    </div>           
+                </div>
+            </div>
+        </div>
+
+        <!-- 红包中间红包 -->
+        <!-- <div class="model redPackModel" v-show="model.redpack">
+            <div class="modelBox">
+                <div class="modelHeader"></div>
+                <div class="modelBody">
+                    <img src="images/result_gift.png" class="giftImg" alt=""> 
+                    <p>京东电子券<br>将发送至该手机号码</p>
+                </div>
+                <div class="modelFooter">
+                    <p>注意信息查收，如有疑问<br>请拨打客服电话：0571-96527</p>                    
+                </div>
+            </div>
+        </div> -->
         <!-- 加载中 -->
         <div id="loadingToast" v-show="loading.status">
             <div class="weui-mask_transparent"></div>
@@ -110,9 +159,9 @@
             </div>
         </div>
         <!-- 提示框，1000消失 -->
-        <div class="tipBox" v-show="model.status">
+        <div class="tipBox" v-show="alert.status">
             <div class="tibBox_inner">
-                <p v-html="model.txt"></p>
+                <p v-html="alert.txt"></p>
             </div>
         </div>
     </div>
@@ -127,7 +176,6 @@
     <script src="js/vue.min.js"></script>
     <script>
         //加载资源数组必须在loading之前进行配置
-        var isComing = 0;  //0代表false 表示没有参加过答题。 1为true表示已参加过答题 , 2为已绑定，但未答题
         $(function () {
             new Vue({
                 el: "#index-box",
@@ -137,7 +185,33 @@
                         two:false,     //首页
                         three:true,    //开奖页
                     },
-                    loading:{   //加载中弹框
+                    model:{
+                        // redpack:false,   
+                        result:false,   //奖品结果
+                        phone:false,    //填写手机号码
+                        gift:false,      //领奖
+                        sorry:true,      //提示
+                    },
+                    gift:{
+                        imgSrc:['images/gift1.png','images/gift2.png','images/gift3.png'],
+                        resultSrc:['images/result_gift.png','images/gift2.png','images/win_3.png'],
+                        resultTxt:['京东电子券','篮球已成功领取'],
+                        txt:['获得京东电子券','获得CBA明星签名篮球','获得现金红包'],
+                        num:2,      //0京东 1篮球  2红包
+                        phone:'18825036989',
+                        money:100
+                    },
+                    open:false,      //是否在开红包
+                    sorry:{
+                        txt:['','我行客服将尽快与您联系<br/>如有疑问，请拨打客服电话<br/><span>0571-96527</span>','您还未签约我行微信银行','本周您已领取过奖品,下周再来吧!','您还未达到账户激活标准哦','本周奖品已领完，期待下次吧。'],
+                        num:4,       
+                        //1-我行客服将尽快与您联系如有疑问，请拨打客服电话 (确定) 
+                        //2-您还未签约我行微信银行 (去签约)
+                        //3-本周您已领取过奖品,下周再来吧! （确定）
+                        //4-您还未达到账户激活标准哦  （拒绝  激活）
+                        //5-本周奖品已领完，期待下次吧。 （确定）
+                    },
+                    loading:{        //加载中弹框
                         status:false,
                         txt:'加载中...'
                     },
@@ -145,7 +219,7 @@
                         status:false,
                         txt:'这里是提示内容'
                     },
-                    model:{     //提示自动消失框
+                    alert:{     //提示自动消失框
                         status:false,
                         txt:'这里是提示内容'
                     }
