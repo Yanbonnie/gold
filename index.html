@@ -9,9 +9,21 @@
     <link rel="stylesheet" href="css/weui.css">
 </head>
 <body>
-    <div class="wrap index_page" id="index-box"> 
+    <div class="wrap index_page" id="index-box">         
+        <!-- 首页 -->
+        <div class="page2" v-show="pageStatus.one">
+            <img src="images/logo.png" class="logo" alt="">
+            <img src="images/title.png" class="title" alt="">
+            <p>活动期间，签约我行电银渠道，同时激活存款账户，即可在微信端上随机领取京东电子卡、CBA明星签名篮球、现金红包等丰厚奖品。【数量有限，先到先得】</p>
+            <div class="btn-box">
+                <a href="javascript:;" @click="pageStatus.three = true"><img src="images/go.png" alt=""></a>
+                <a href="javascript:;" @click="pageStatus.two = true"><img src="images/rule.png" alt=""></a>
+            </div>
+        </div>
+
         <!-- 活动规则 -->
-        <div class="page1" v-show="pageStatus.one">
+        <div class="page1" v-show="pageStatus.two"><!---->
+            <span class="close" @click="pageStatus.two = false">x</span>
             <div class="pageBox">
                 <img class="title" src="images/rule_title.png" alt="">
                 <p>即日起-2018年02月28日活动期间，签约我行电银渠道，同时激活存款账户，即可在微信端上随机领取京东电子卡、CBA明星签名篮球、现金红包等丰厚奖品</p>
@@ -22,19 +34,10 @@
                 <p class="tip">活动最终解释权在法律允许的范围内归稠州银行所有</p>
             </div>
         </div>
-        <!-- 首页 -->
-        <div class="page2" v-show="pageStatus.two">
-            <img src="images/logo.png" class="logo" alt="">
-            <img src="images/title.png" class="title" alt="">
-            <p>活动期间，签约我行电银渠道，同时激活存款账户，即可在微信端上随机领取京东电子卡、CBA明星签名篮球、现金红包等丰厚奖品。【数量有限，先到先得】</p>
-            <div class="btn-box">
-                <a href="javascript:;"><img src="images/go.png" alt=""></a>
-                <a href="javascript:;"><img src="images/rule.png" alt=""></a>
-            </div>
-        </div>
+
         <!-- 开奖页 -->
         <div class="page3" v-show="pageStatus.three">
-            <img src="images/chai.png" class="chai" alt="">
+            <img src="images/chai.png"  class="chai" :class="[lotteryState ? 'shake':'']" alt="" @click="lotteryHandle">
         </div>
 
         <!-- 京东电子卡和篮球奖品弹框 -->
@@ -42,15 +45,15 @@
             <div class="modelBox">
                 <div class="modelHeader"></div>
                 <div class="modelBody">
-                    <img :src="gift.imgSrc[gift.num]"  :class="[gift.num == 2 ? 'redpackImg':'giftImg']" alt=""> <!--images/gift2.png-->
-                    <img class="openRed" v-if="gift.num == 2" src="images/kai.png" :class="[open ? 'kai_active':'']" alt=""> <!--kai_active-->
+                    <img :src="gift.imgSrc[gift.num]"  :class="[gift.num == 3 ? 'redpackImg':'giftImg']" alt=""> <!--images/gift2.png-->
+                    <img class="openRed" v-if="gift.num == 3" src="images/kai.png" @click="openHandle" :class="[open ? 'kai_active':'']" alt=""> <!--kai_active-->
                     <img src="images/line.png" class="line" alt="">
                     <p class="txt">恭喜您</p>
-                    <p>{{gift.txt[gift.num]}}</p> <!--获得京东电子券-->
-                    <p v-show="gift.num != 2"><input type="text" name="" id="" v-model="gift.phone"></p>
+                    <p>{{gift.txt}}</p> <!--获得京东电子券-->
+                    <p v-show="gift.num != 3"><input type="text" name="" id="" v-model="gift.phone"></p>
                 </div>
                 <div class="modelFooter">
-                    <span class="submit" v-show="gift.num != 2">
+                    <span class="submit" v-show="gift.num != 3" @click="submitSure">
                         <img src="images/submit.png"  alt="">
                     </span>                    
                 </div>
@@ -66,25 +69,25 @@
                     <h3>18825369856</h3>
                 </div>
                 <div class="modelFooter clf">
-                    <span class="back">
+                    <span class="back" @click="model.gift = true;model.phone = false">
                         <img src="images/back.png"  alt="">
                     </span>
-                    <span class="sure">
+                    <span class="sure" @click="sureSubmitPhone">
                         <img src="images/sure.png"  alt="">
                     </span>                    
                 </div>
             </div>
         </div>
         <!-- 奖品结果弹框 -->
-        <div class="model resultModel" v-show="model.result" :class="[gift.num == 2 ? 'rewardModelRed' : '']"> 
+        <div class="model resultModel" v-show="model.result" :class="[gift.num == 3 ? 'rewardModelRed' : '']"> 
             <div class="modelBox">
-                <i class="close"><img src="images/close.png" alt=""></i>
+                <i class="close" @click="model.result = false;pageStatus.three=false;pageStatus.one = true;"><img src="images/close.png" alt=""></i>
                 <div class="modelHeader"></div>
-                <div class="modelBody" v-if="gift.num != 2">
+                <div class="modelBody" v-if="gift.num != 3">
                     <img :src="gift.resultSrc[gift.num]" class="giftImg" alt=""> <!--images/gift2.png-->
                     <p class="txt" v-html="gift.resultTxt[gift.num]"></p>
-                    <p v-if="gift.num == 0">将发送至该{{gift.phone}}号码</p>
-                    <p v-if="gift.num == 1">我们会与该{{gift.phone}}联系，<br/>请保持手机通畅</p>
+                    <p v-if="gift.num == 1">将发送至该{{gift.phone}}号码</p>
+                    <p v-if="gift.num == 2">我们会与该{{gift.phone}}联系，<br/>请保持手机通畅</p>
                 </div>
                 <div class="modelMoney" v-else>
                     <img :src="gift.resultSrc[gift.num]" alt=""> <!--images/gift2.png-->
@@ -108,8 +111,8 @@
                     </div>
                 </div>
                 <div class="modelFooter clf">
-                    <div v-if="sorry.num == 1 || sorry.num == 3 || sorry.num == 5">
-                        <a href="javascript:;" class="submit"><img src="images/sure_close.png" alt=""></a>
+                    <div v-if="sorry.num != 1 && sorry.num != 4">
+                        <a href="javascript:;" class="submit" @click="model.sorry = false"><img src="images/sure_close.png" alt=""></a>
                     </div>
                     <div v-if="sorry.num == 2">
                         <a href="javascript:;" class="submit"><img src="images/go_sign.png" alt=""></a>
@@ -169,7 +172,38 @@
     <script type="text/javascript">
         var basep = "images/", //图片目录
             preLoadSource = [ //背景资源
-
+            basep + "back.png",
+            basep + "chai.png",
+            basep + "close.png",
+            basep + "error.png",
+            basep + "gift.png",
+            basep + "gift1.png",
+            basep + "gift2.png",
+            basep + "gift3.png",
+            basep + "go.png",
+            basep + "go_sign.png",
+            basep + "gx_title.png",
+            basep + "index.jpg",
+            basep + "index_bg.jpg",
+            basep + "index_bg2.jpg",
+            basep + "jihuo.png",
+            basep + "kai.png",
+            basep + "kefu.png",
+            basep + "line.png",
+            basep + "logo.png",
+            basep + "phone.png",
+            basep + "red_pack.png",
+            basep + "refuse.png",
+            basep + "result_gift.png",
+            basep + "rule.png",
+            basep + "rule_title.png",
+            basep + "sorry_1.png",
+            basep + "sorry_2.png",
+            basep + "submit.png",
+            basep + "sure.png",
+            basep + "sure_close.png",
+            basep + "title.png",
+            basep + "win_3.png",
             ];
     </script>
     <script src="js/loading.js"></script>
@@ -181,36 +215,46 @@
                 el: "#index-box",
                 data: {
                     pageStatus:{
-                        one:false,     //活动规则
-                        two:false,     //首页
-                        three:true,    //开奖页
+                        one:true,       //首页
+                        two:false,       //活动规则
+                        three:false,    //开奖页
                     },
                     model:{
                         // redpack:false,   
                         result:false,   //奖品结果
                         phone:false,    //填写手机号码
                         gift:false,      //领奖
-                        sorry:true,      //提示
-                    },
-                    gift:{
-                        imgSrc:['images/gift1.png','images/gift2.png','images/gift3.png'],
-                        resultSrc:['images/result_gift.png','images/gift2.png','images/win_3.png'],
-                        resultTxt:['京东电子券','篮球已成功领取'],
-                        txt:['获得京东电子券','获得CBA明星签名篮球','获得现金红包'],
-                        num:2,      //0京东 1篮球  2红包
-                        phone:'18825036989',
-                        money:100
-                    },
+                        sorry:false,      //提示
+                    },                    
+                    lotteryState:false,    //抽奖状态
                     open:false,      //是否在开红包
+                    gift:{
+                        imgSrc:['','images/gift1.png','images/gift2.png','images/gift3.png'],
+                        resultSrc:['','images/result_gift.png','images/gift2.png','images/win_3.png'],
+                        resultTxt:['','京东电子券','篮球已成功领取'],
+                        // txt:['获得京东电子券','获得CBA明星签名篮球','获得现金红包'],
+                        txt:'',        //奖品名称
+                        num:null,      //中奖等级；当is_prize为1时，此参数有值 ，1为京东券，2为篮球，3为微信红包
+                        phone:'',
+                        money:null,     //当prize_level为3时，此参数有值，为红包⾦额
+                    },
+                    is_sign:null,           //⽤户是否签约;1为已签约，0为未签约
+                    is_activation:null,     //⽤户是否激活；1为已激活，0为未激活
+                    is_prize:null,          //⽤户本周是否中过奖，1为已中奖，0为未中奖
+                    is_draw:null,           //⽤户是否提交过资料，1为已提交过，0为未提交过
+                    is_week:0,    //0为本周没抽奖，1是本周已抽过奖
                     sorry:{
-                        txt:['','我行客服将尽快与您联系<br/>如有疑问，请拨打客服电话<br/><span>0571-96527</span>','您还未签约我行微信银行','本周您已领取过奖品,下周再来吧!','您还未达到账户激活标准哦','本周奖品已领完，期待下次吧。'],
-                        num:4,       
+                        txt:['','我行客服将尽快与您联系<br/>如有疑问，请拨打客服电话<br/><span>0571-96527</span>','您还未签约我行微信银行','本周您已领取过奖品,下周再来吧!','您还未达到账户激活标准哦','本周奖品已领完，期待下次吧。','很抱歉，您未中奖，下周再来吧。','您本周已抽奖，下周再来吧。'],
+                        num:null,       
                         //1-我行客服将尽快与您联系如有疑问，请拨打客服电话 (确定) 
                         //2-您还未签约我行微信银行 (去签约)
                         //3-本周您已领取过奖品,下周再来吧! （确定）
                         //4-您还未达到账户激活标准哦  （拒绝  激活）
                         //5-本周奖品已领完，期待下次吧。 （确定）
+                        //6-未中奖
+                        //7-本周已抽过奖
                     },
+                     
                     loading:{        //加载中弹框
                         status:false,
                         txt:'加载中...'
@@ -222,34 +266,224 @@
                     alert:{     //提示自动消失框
                         status:false,
                         txt:'这里是提示内容'
-                    }
+                    },
+                    linkHref:{
+                        info:'',           //用户信息接口
+                        lottery:'',        //抽奖接口
+                        submitPhone:'',    //提交手机号
+                    },
                 },
                 methods: {   
-                    validate(){   //验证手机号码是否正确
+                    sureSubmitPhone:function(){  //确认提交信息
                         var This = this;
-                        var validate = this.isPhone(this.lottery.phone);
-                        if(!validate){
-                            This.showDialog('手机号码格式不正确');
-                            return false;
-                        };
-                        this.alertModel.lotterySuccess = false;
-                        this.alertModel.phoneShow = true;
-                    },
-                    randomHandle: function (x, y) {
-                        // x是随机数上限，y是随机数下限
-                        let rand = parseInt(Math.random() * (x - y + 1) + y);
-                        return rand;
-                    },
-                    getInfo: function () {
-                        var This = this;
+                        This.loading.status = true;
+                        This.loading.txt = '提交中...';
+                        //前端测试数据
+                        // setTimeout(function(){
+                        //     This.loading.status = false;
+                        //         This.loading.txt = '';
+                        //     This.model.phone = false;
+                        //     This.model.result = true;
+                        // },1000);
+                        // return;
                         $.ajax({
-                            url: This.linkHref.bind,
+                            url: This.linkHref.submitPhone,
                             dataType: 'json',
                             type: 'post',
+                            data: {
+                                'mobile':This.gift.phone
+                            },
+                            async: true,
+                            success: function (res) {
+                                This.loading.status = false;
+                                This.loading.txt = '';
+                                if(res.status == 0){
+                                    This.model.phone = false;
+                                    This.model.result = true;
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(XMLHttpRequest)
+                            }
+                        })
+                    },
+                    submitSure:function(){   //手机号码提交按钮
+                        var This = this;
+                        if(this.gift.phone == ''){
+                            this.alert.status = true;
+                            this.alert.txt = '手机号码不能为空';
+                            setTimeout(function(){
+                                This.alert.status = false;
+                            },1500)
+                            return;
+                        }
+                        if(!this.isPhone(this.gift.phone)){
+                            this.alert.status = true;
+                            this.alert.txt = '手机号码格式不正确';
+                            setTimeout(function(){
+                                This.alert.status = false;
+                            },1500)
+                            return;
+                        }
+                        this.model.gift = false;
+                        this.model.phone = true;
+
+                    },
+                    openHandle:function(){  //开红包
+                        var This = this;
+                        this.open = true;
+                        setTimeout(function(){
+                            This.open = false;
+                            This.model.result = true;
+                            This.model.gift = false;
+                        },1000)
+                    },
+                    lotteryHandle:function(){  //抽奖
+                        var This = this;
+                        this.lotteryState = true;
+                        //前端测试数据
+                        // var res = {
+                        //     status:0,
+                        //     is_prize:1,
+                        //     prize_level:2,
+                        //     prize_name:'京东券',
+                        //     money:'99',
+                        //     is_week:0,    //0为本周没抽奖，1是本周已抽过奖
+                        // }
+                        // setTimeout(function(){
+                        //     This.lotteryState = false;
+                        //     if(res.status == 0){
+                        //         This.isPrize = res.is_prize;
+                        //         This.is_week = res.is_week;
+                        //         if(This.is_week){  //本周已抽奖
+                        //             This.model.sorry = true;
+                        //             This.sorry.num = 7;
+                        //             return;
+                        //         }
+                        //         if(This.isPrize == 1){   //已中奖
+                        //             This.model.gift = true;
+                        //             This.gift.num = res.prize_level;
+                        //             This.gift.txt = res.prize_name;
+                        //             if(res.prize_level == 3){
+                        //                 This.gift.money = res.money;
+                        //             }
+                        //         }else{  //未中奖
+                        //             This.model.sorry = true;
+                        //             This.sorry.num = 6;
+                        //         }
+                        //     }else if(res.status == 2){   //您本周已抽奖，下周再来吧。
+                        //         This.model.sorry = true;
+                        //         This.sorry.num = 5;
+                        //     }else{
+
+                        //     }                            
+                        // },1000)
+                        // return;
+                        $.ajax({
+                            url: This.linkHref.lottery,
+                            dataType: 'json',
+                            type: 'get',
                             data: {},
                             async: true,
                             success: function (res) {
-                                
+                                This.lotteryState = false;
+                                if(res.status == 0){
+                                    This.isPrize = res.is_prize;
+                                    This.is_week = res.is_week;
+                                    if(This.is_week){  //本周已抽奖
+                                        This.model.sorry = true;
+                                        This.sorry.num = 7;
+                                        return;
+                                    }
+                                    if(This.isPrize == 1){   //已中奖
+                                        This.model.gift = true;
+                                        This.gift.num = res.prize_level;
+                                        This.gift.txt = res.prize_name;
+                                        if(res.prize_level == 3){
+                                            This.gift.money = res.money;
+                                        }
+                                    }else{  //未中奖
+                                        This.model.sorry = true;
+                                        This.sorry.num = 6;
+                                    }
+                                }else if(res.status == 2){   //您本周已抽奖，下周再来吧。
+                                    This.model.sorry = true;
+                                    This.sorry.num = 5;
+                                }else{
+    
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(XMLHttpRequest)
+                            }
+                        })
+                    },
+                    getInfo: function () {
+                        var This = this;
+                        //前端测试数据
+                        // var res = {
+                        //     is_sign:1,
+                        //     is_activation:1,
+                        //     is_prize:0,
+                        //     is_draw:0,
+                        //     prize_level:3,
+                        //     prize_name:'京东电子券',
+                        //     money:100
+                        // }
+
+                        // This.is_sign = res.is_sign;
+                        // This.is_activation = res.is_activation;
+                        // This.is_prize = res.is_prize;  
+                        // This.is_draw = res.is_draw;
+                        // This.gift.num = res.prize_level;   //中几等奖
+                        // This.gift.txt = res.prize_name;    //中奖名称
+                        // This.gift.money = res.money;
+                        // if(!This.is_sign){ //未签约
+                        //     This.model.sorry = true;
+                        //     This.sorry.num = 2;
+                        //     return;
+                        // }
+                        // if(!This.is_activation){   //未激活
+                        //     This.model.sorry = true;
+                        //     This.sorry.num = 4;
+                        //     return;
+                        // }
+                        // if(This.is_prize){   //本周中奖
+                        //     if(!This.is_draw){   //未领奖
+                        //         This.model.gift = true;
+                        //         return;
+                        //     }
+                        // }
+                        // return false;
+                        $.ajax({
+                            url: This.linkHref.info,
+                            dataType: 'json',
+                            type: 'get',
+                            data: {},
+                            async: true,
+                            success: function (res) {
+                                if(res.status == 0){
+                                    This.is_sign = res.is_sign;
+                                    This.is_activation = res.is_activation;
+                                    This.is_prize = res.is_prize;  
+                                    This.is_draw = res.is_draw;
+                                    This.gift.num = res.prize_level;   //中几等奖
+                                    This.gift.txt = res.prize_name;    //中奖名称
+                                    This.gift.money = res.money;
+                                    if(!This.is_sign){ //未签约
+                                        This.model.sorry = true;
+                                        This.sorry.num = 2;
+                                    }
+                                    if(!This.is_activation){   //未激活
+                                        This.model.sorry = true;
+                                        This.sorry.num = 4;
+                                    }
+                                    if(This.is_prize){   //本周中奖
+                                        if(!This.is_draw){   //未领奖
+                                            This.model.gift = true;
+                                        }
+                                    }
+                                }
                             },
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 console.log(XMLHttpRequest)
@@ -262,18 +496,12 @@
                         }
                         return /^0?1[3|4|5|7|8][0-9]\d{8}$/.test(str);
                     },
-                    showDialog(msg){
-                        this.alertModel.dialog = true;
-                        this.dialogTxt = msg
-                    },
                     init: function () {
-                        var This = this;
-                        // this.getInfo();  //获取个人信息
+                        this.getInfo();  //获取个人信息
                     }
                 },
                 mounted: function () {
                     this.init();
-
                 }
             })
         })
