@@ -66,7 +66,7 @@
                 <div class="modelBody">
                     <img src="images/phone.png" alt="">
                     <p>您输入的手机号码为</p>
-                    <h3>18825369856</h3>
+                    <h3>{{gift.phone}}</h3>
                 </div>
                 <div class="modelFooter clf">
                     <span class="back" @click="model.gift = true;model.phone = false">
@@ -499,14 +499,14 @@
                                     This.gift.num = res.prize_level;   //中几等奖
                                     This.gift.txt = res.prize_name;    //中奖名称
                                     This.gift.money = res.money;
-                                    if(!This.is_sign){ //未签约
-                                        This.model.sorry = true;
-                                        This.sorry.num = 2;
-                                    }
-                                    if(!This.is_activation){   //未激活
-                                        This.model.sorry = true;
-                                        This.sorry.num = 4;
-                                    }
+                                    // if(!This.is_sign){ //未签约
+                                    //     This.model.sorry = true;
+                                    //     This.sorry.num = 2;
+                                    // }
+                                    // if(!This.is_activation){   //未激活
+                                    //     This.model.sorry = true;
+                                    //     This.sorry.num = 4;
+                                    // }
                                     if(This.is_prize){   //本周中奖
                                         if(!This.is_draw){   //未领奖
                                             This.model.gift = true;
