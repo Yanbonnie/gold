@@ -16,7 +16,7 @@
             <img src="images/title.png" class="title" alt="">
             <p>活动期间，签约我行电银渠道，同时激活存款账户，即可在微信端上随机领取京东电子卡、CBA明星签名篮球、现金红包等丰厚奖品。【数量有限，先到先得】</p>
             <div class="btn-box">
-                <a href="javascript:;" @click="pageStatus.three = true"><img src="images/go.png" alt=""></a>
+                <a href="javascript:;" @click="goHandle"><img src="images/go.png" alt=""></a>
                 <a href="javascript:;" @click="pageStatus.two = true"><img src="images/rule.png" alt=""></a>
             </div>
         </div>
@@ -329,6 +329,19 @@
                         this.model.gift = false;
                         this.model.phone = true;
 
+                    },
+                    goHandle(){
+                        if(!this.is_sign){ //未签约
+                            this.model.sorry = true;
+                            this.sorry.num = 2;
+                            return;
+                        }
+                        if(!this.is_activation){   //未激活
+                            this.model.sorry = true;
+                            this.sorry.num = 4;
+                            return;
+                        }
+                        this.pageStatus.three = true
                     },
                     openHandle:function(){  //开红包
                         var This = this;
