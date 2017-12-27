@@ -118,7 +118,7 @@
                         <a href="javascript:;" class="submit"><img src="images/go_sign.png" alt=""></a>
                     </div>    
                     <div v-if="sorry.num == 4">
-                            <span class="back">
+                            <span class="back" @click="model.sorry = false;">
                                 <img src="images/refuse.png"  alt="">
                             </span>
                             <span class="sure">
@@ -268,9 +268,10 @@
                         txt:'这里是提示内容'
                     },
                     linkHref:{
-                        info:'',           //用户信息接口
-                        lottery:'',        //抽奖接口
-                        submitPhone:'',    //提交手机号
+                        info:'http://wx.xhwxpos.com/bank_payments/index.php?m=Wap&c=Index&a=ajax_get_status&debug=1',              //用户信息接口
+                        lottery:'http://wx.xhwxpos.com/bank_payments/index.php?m=Wap&c=Index&a=ajax_lottery&debug=1',              //抽奖接口
+                        submitPhone:'http://wx.xhwxpos.com/bank_payments/index.php?m=Wap&c=Index&a=ajax_commit_mobile&debug=1',    //提交手机号
+                        openRed:'http://wx.xhwxpos.com/bank_payments/index.php?m=Wap&c=Index&a=ajax_draw&debug=1',                 //打开红包
                     },
                 },
                 methods: {   
@@ -332,11 +333,26 @@
                     openHandle:function(){  //开红包
                         var This = this;
                         this.open = true;
-                        setTimeout(function(){
-                            This.open = false;
-                            This.model.result = true;
-                            This.model.gift = false;
-                        },1000)
+                        $.ajax({
+                            url: This.linkHref.openRed,
+                            dataType: 'json',
+                            type: 'get',
+                            data: {},
+                            async: true,
+                            success: function (res) {
+                                setTimeout(function(){
+                                    This.open = false;
+                                    if(res.status == 0){                                    
+                                        This.model.result = true;
+                                        This.model.gift = false;
+                                        This.gift.money = res.money;
+                                    }
+                                },1000)
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(XMLHttpRequest)
+                            }
+                        })
                     },
                     lotteryHandle:function(){  //抽奖
                         var This = this;
@@ -420,10 +436,10 @@
                     },
                     getInfo: function () {
                         var This = this;
-                        //前端测试数据
+                        // 前端测试数据
                         // var res = {
                         //     is_sign:1,
-                        //     is_activation:1,
+                        //     is_activation:0,
                         //     is_prize:0,
                         //     is_draw:0,
                         //     prize_level:3,
