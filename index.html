@@ -26,11 +26,11 @@
             <span class="close" @click="pageStatus.two = false">x</span>
             <div class="pageBox">
                 <img class="title" src="images/rule_title.png" alt="">
-                <p>即日起-2018年02月28日活动期间，签约我行电银渠道，同时激活存款账户，即可在微信端上随机领取京东电子卡、CBA明星签名篮球、现金红包等丰厚奖品</p>
-                <div><a href="javascript:;">活动奖项</a></div>
+                <!-- <p>即日起-2018年02月28日活动期间，签约我行电银渠道，同时激活存款账户，即可在微信端上随机领取京东电子卡、CBA明星签名篮球、现金红包等丰厚奖品</p>
+                <div><a href="javascript:;">活动奖项</a></div> -->
                 <div><img src="images/gift.png" alt=""></div>
-                <div><a href="javascript:;">抽奖结果</a></div>
-                <p>电子券奖品以短信形式发送至客户中奖手机；实物奖品待活动结束后统一寄送,数量有限，先到先得!</p>
+                <!-- <div><a href="javascript:;">抽奖结果</a></div>
+                <p>电子券奖品以短信形式发送至客户中奖手机；实物奖品待活动结束后统一寄送,数量有限，先到先得!</p> -->
                 <p class="tip">活动最终解释权在法律允许的范围内归稠州银行所有</p>
             </div>
         </div>
@@ -215,8 +215,8 @@
                 el: "#index-box",
                 data: {
                     pageStatus:{
-                        one:true,       //首页
-                        two:false,       //活动规则
+                        one:false,       //首页
+                        two:true,       //活动规则
                         three:false,    //开奖页
                     },
                     model:{
