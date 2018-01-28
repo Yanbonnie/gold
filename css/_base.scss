@@ -150,6 +150,7 @@ $WHITE:        #ffffff;//bg color
     @include prefixer(background-size,100% 100%);
 }
 
+
 /*
 @include prefixer(border-radius,REM(20))
 @include fullBg(REM(24),REM(24),'add.png');
@@ -161,3 +162,28 @@ background: url($URL+'pre.png') no-repeat;
 .clf:before, .clf:after {content:"";display:table;}
 .clf:after{clear:both;}
 .clf{*zoom:1;}
+
+/*flex*/
+@mixin box{
+  display: -webkit-flex;  /* 新版本语法: Chrome 21+ */
+  display: flex;          /* 新版本语法: Opera 12.1, Firefox 22+ */
+  display: -webkit-box;   /* 老版本语法: Safari, iOS, Android browser, older WebKit browsers. */
+  display: -moz-box;      /* 老版本语法: Firefox (buggy) */
+  display: -ms-flexbox;   /* 混合版本语法: IE 10 */
+}
+
+.box{
+  display: -webkit-flex;  /* 新版本语法: Chrome 21+ */
+  display: flex;          /* 新版本语法: Opera 12.1, Firefox 22+ */
+  display: -webkit-box;   /* 老版本语法: Safari, iOS, Android browser, older WebKit browsers. */
+  display: -moz-box;      /* 老版本语法: Firefox (buggy) */
+  display: -ms-flexbox;   /* 混合版本语法: IE 10 */
+}
+@mixin flexBox{
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;        /* Chrome */
+  -ms-flex: 1;            /* IE 10 */
+  flex: 1;                /* NEW, Spec - Opera 12.1, Firefox 20+ */
+  -webkit-box-flex: 1;    /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 1;       /* OLD - Firefox 19- */
+}
