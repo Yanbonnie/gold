@@ -9,107 +9,31 @@
     <link rel="stylesheet" href="css/weui.css">
 </head>
 <body>
-    <div class="wrap" id="index-box">
+    <div class="wrap" id="index-box"  v-cloak>
         <div class="top">
             <img src="images/title.png" class="title" alt="">
-            <span class="count">您已抢到000.3g黄金</span>
+            <span class="count">您已抢到{{score}}g黄金</span>
             <img src="images/logo.png" class="logo" alt="">
-            <div class="btn-box">
-                <span><img src="images/btn_1.png" alt=""></span>
-                <span><img src="images/btn_2.png" alt=""></span>
+            <div class="btn-box" v-if="type == 1"> <!--自己抢-->
+                <span @click="grabHandle(1)"><img :src="'images/btn_'+mySelfNum+'.png'" alt=""></span>   <!--我要抢-->
+                <span @click="alertModel.gift = true"><img src="images/btn_2.png" alt=""></span>   <!--现在就兑换-->
+            </div>
+            <div class="btn-box" v-if="type == 2"> <!--好友助力-->
+                <span><img :src="'images/btn_s_'+mySelfNum+'.png'" alt="" @click="praiseHandle"></span>  <!--帮他抢黄金-->
+                <span><img src="images/btn_3_1.png" @click="grabHandle(0)" alt=""></span>  <!--我要抢黄金-->
             </div>
         </div>
         <div class="rankingBox">
             <div class="ranking">
                 <ul class="sign_page_scrollBody">
-                    <li>
+                    <li class="no-message" v-if="friends_list && friends_list.length == 0">暂无好友助力，赶快邀请好友助力抢黄金吧!</li>
+                    <li v-for="(item,index) in friends_list">
                         <p>
-                            <span>小妮子</span>
-                            <span>2018-01-01</span>
+                            <span>{{item.name}}</span>
+                            <span>{{item.time}}</span>
                         </p>
                         <p>
-                            已帮你抢到0.003g黄金，再接再厉哦！
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <span>小妮子</span>
-                            <span>2018-01-01</span>
-                        </p>
-                        <p>
-                            已帮你抢到0.003g黄金，再接再厉哦！
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <span>小妮子</span>
-                            <span>2018-01-01</span>
-                        </p>
-                        <p>
-                            已帮你抢到0.003g黄金，再接再厉哦！
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <span>小妮子</span>
-                            <span>2018-01-01</span>
-                        </p>
-                        <p>
-                            已帮你抢到0.003g黄金，再接再厉哦！
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <span>小妮子</span>
-                            <span>2018-01-01</span>
-                        </p>
-                        <p>
-                            已帮你抢到0.003g黄金，再接再厉哦！
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <span>小妮子</span>
-                            <span>2018-01-01</span>
-                        </p>
-                        <p>
-                            已帮你抢到0.003g黄金，再接再厉哦！
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <span>小妮子</span>
-                            <span>2018-01-01</span>
-                        </p>
-                        <p>
-                            已帮你抢到0.003g黄金，再接再厉哦！
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <span>小妮子</span>
-                            <span>2018-01-01</span>
-                        </p>
-                        <p>
-                            已帮你抢到0.003g黄金，再接再厉哦！
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <span>小妮子</span>
-                            <span>2018-01-01</span>
-                        </p>
-                        <p>
-                            已帮你抢到0.003g黄金，再接再厉哦！
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <span>小妮子</span>
-                            <span>2018-01-01</span>
-                        </p>
-                        <p>
-                            已帮你抢到0.003g黄金，再接再厉哦！
+                            已帮你抢到{{item.score}}黄金，再接再厉哦！
                         </p>
                     </li>
                 </ul>
@@ -119,18 +43,37 @@
                 <span class="line4"></span>
             </div>
         </div>
-        <div class="cover gift" v-show="false">
+        <div class="cover gift" v-show="alertModel.gift">
             <div class="coverBox">
-                <input type="text" placeholder="请输入兑换密码">
+                <input type="password" placeholder="请输入兑换密码" v-model="password">  
                 <div class="btn-box">
-                    <span>取消</span>
-                    <span>兑换</span>
+                    <span @click="alertModel.gift = false; password = ''">取消</span>
+                    <span @click="exchangeHandle">兑换</span>
                 </div>
             </div>
         </div>
         <!--分享-->
-        <div class="cover share" v-show="false">
+        <div class="cover share" v-show="alertModel.share">
             <img src="images/share.png" alt="">
+        </div>
+        <!-- loading -->
+        <div id="loadingToast" v-show="alertModel.loading">
+            <div class="weui-mask_transparent"></div>
+            <div class="weui-toast">
+                <i class="weui-loading weui-icon_toast"></i>
+                <p class="weui-toast__content">{{alertModel.loadingTxt}}</p>
+            </div>
+        </div>
+        <!--按钮提示框-->
+        <!--BEGIN dialog2-->
+        <div class="js_dialog" id="iosDialog2" v-show="alertModel.dialog">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__bd">{{alertModel.dialogTxt}}</div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" @click="alertModel.dialog = false">知道了</a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -142,7 +85,9 @@
             basep + "btn_1.png",
             basep + "btn_2.png",
             basep + "btn_3.png",
-            basep + "btn_4.png",
+            basep + "btn_3_1.png",
+            basep + "btn_s_1.png",
+            basep + "btn_s_3.png",
             basep + "line_01.png",
             basep + "line_02.png",
             basep + "logo.png",
@@ -155,18 +100,155 @@
     <script>
         //加载资源数组必须在loading之前进行配置
         $(function () {
+            var code = 'adasfasfasfasdf';
+            var type = 2;
             new Vue({
                 el: "#index-box",
                 data: {
-
-                },
-                methods: {
-                    init: function () {
-
+                    alertModel:{
+                        loading:false,
+                        loadingTxt:'加载中...',
+                        dialog:false,
+                        dialogTxt:'',
+                        gift:false,
+                        share:false,
+                    },
+                    mySelfNum:3,                     //3我要抢黄金，1继续抢黄金
+                    type:type,                       //页面类型 1-为自己抢 2-好友助力
+                    code:code,                       //type为2时，助力对象的识别码
+                    score:'',                        //已获得的黄金
+                    is_subscribe:1,                  //1-已关注，0未关注                    
+                    is_finish:0,                     //今天是否抢够3次，0-否  1-是
+                    is_full:0,                       //今天是否抢够0.3g,0-否  1-是  （为1时，提示用户每天每人至多只能得到0.3g）
+                    friends_list:null,               //好友助力列表数据
+                    name:'',                         //好友名字
+                    password:'',                     //兑换密码
+                    linkHref:{
+                        userinfo:'http://wx.xhwxpos.com/hmhchain/index.php? m=Wap&c=Index&a=ajax_get_userinfo',   //获取用户状态信息(get)
+                        praise:'http://wx.xhwxpos.com/hmhchain/index.php? m=Wap&c=Index&a=ajax_post_praise',      //好友助力(post)
+                        exchange:'http://wx.xhwxpos.com/hmhchain/index.php? m=Wap&c=Index&a=ajax_post_exchange',  //用户兑换奖品接口(post)
                     }
                 },
+                methods: {
+                    //兑换
+                    exchangeHandle:function(){
+                        if(!this.password){
+                            this.showDialog('密码不能为空!');
+                            return;
+                        }
+                        var This = this;
+                        this.alertModel.loading = true;
+                        this.alertModel.loadingTxt = '兑换中...'
+                        $.ajax({
+                            url: This.linkHref.exchange,
+                            dataType: 'json',
+                            type: 'post',
+                            data: {
+                                password:this.password,
+                            },
+                            async: true,
+                            success: function (res) {
+                                This.alertModel.loading = false;
+                                This.alertModel.loadingTxt = '加载中...';
+                                if (res.status == 0) {   //成功
+                                    This.alertModel.gift = false;
+                                    This.score = 0 ;
+                                } else {     //不正常                                    
+                                    This.showDialog(res.msg);
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(XMLHttpRequest)
+                            }
+                        })
+                    },
+                    //助力接口
+                    praiseHandle:function(){
+                        var This  = this;
+                        this.alertModel.loading = true;
+                        this.alertModel.loadingTxt = '抢购中...';
+                        $.ajax({
+                            url: This.linkHref.praise,
+                            dataType: 'json',
+                            type: 'post',
+                            data: {
+                                code:this.code
+                            },
+                            async: true,
+                            success: function (res) {
+                                This.alertModel.loading = false;
+                                This.alertModel.loadingTxt = '加载中...';
+                                if (res.status == 0) {   //成功
+                                    This.mySelfNum = 1;
+                                    This.score = This.score + res.score;
+                                    if(This.type == 2){
+                                        var data = new Date();
+                                        This.friends_list.push({
+                                            name:This.name,
+                                            score:res.score,
+                                            time:data.getFullYear()+'-'+data.getMonth()+1+'-'+data.getDate()
+                                        })
+                                    }
+                                } else {     //不正常                                    
+                                    This.showDialog(res.msg);
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(XMLHttpRequest)
+                            }
+                        })
+                    },
+                    //我要抢黄金
+                    grabHandle:function(num){   //num-1 页面进来  num-0 分享页面进来
+                        if(num){
+                            this.praiseHandle();
+                        }else{
+                            if(this.is_subscribe){  //为1时 已关注
+                                window.location.href="http://wx.xhwxpos.com/hmhchain/index.php";  //活动首页
+                            }else{ //未关注
+                                window.location.href = '';  //跳到外链
+                            }
+                        }
+                    },
+                    //获取用户信息
+                    getUserInfo:function(){
+                        var This = this;
+                        this.alertModel.loading = true;
+                        $.ajax({
+                            url: This.linkHref.userinfo,
+                            dataType: 'json',
+                            type: 'get',
+                            data: {
+                              code:This.code  
+                            },
+                            async: true,
+                            success: function (res) {
+                                This.alertModel.loading = false;
+                                if (res.status == 0) {   //成功
+                                    This.score = res.score;
+                                    This.is_subscribe = res.is_subscribe;
+                                    // This.type = res.type;
+                                    // This.code = res.code;
+                                    This.is_finish = res.is_finish;
+                                    This.is_full = res.is_full;
+                                    This.friends_list = res.friends_list;
+                                    This.name = res.name;
+                                } else {     //不正常                                    
+                                    This.showDialog(res.msg);
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                console.log(XMLHttpRequest)
+                            }
+                        })    
+                    },
+                    showDialog:function(msg){
+                        this.alertModel.dialog = true;
+                        this.alertModel.dialogTxt = msg;
+                    },
+                },
                 mounted: function () {
-                    this.init();
+                    this.getUserInfo();
                 }
             })
         })
