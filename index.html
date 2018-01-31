@@ -43,6 +43,7 @@
                 <span class="line4"></span>
             </div>
         </div>
+        <!--兑换-->
         <div class="cover gift" v-show="alertModel.gift">
             <div class="coverBox">
                 <input type="password" placeholder="请输入兑换密码" v-model="password">  
@@ -50,6 +51,13 @@
                     <span @click="alertModel.gift = false; password = ''">取消</span>
                     <span @click="exchangeHandle">兑换</span>
                 </div>
+            </div>
+        </div>
+        <!--二维码-->
+        <div class="cover ewm" v-show="alertModel.ewm" @click="alertModel.ewm = false">
+            <div class="coverBox">
+                <img src="images/ewm.png" alt="">
+                <p>长按关注，回复抢黄金</p>
             </div>
         </div>
         <!--分享-->
@@ -110,6 +118,7 @@
                         loadingTxt:'加载中...',
                         dialog:false,
                         dialogTxt:'',
+                        ewm:false,
                         gift:false,
                         share:false,
                     },
@@ -206,8 +215,10 @@
                             if(this.is_subscribe){  //为1时 已关注
                                 window.location.href="http://wx.xhwxpos.com/hmhchain/index.php";  //活动首页
                             }else{ //未关注
-                                window.location.href = '';  //跳到外链
+                                // window.location.href = '';  //跳到外链
+                                this.alertModel.ewm = true;
                             }
+
                         }
                     },
                     //获取用户信息
@@ -227,12 +238,18 @@
                                 if (res.status == 0) {   //成功
                                     This.score = res.score;
                                     This.is_subscribe = res.is_subscribe;
-                                    // This.type = res.type;
-                                    // This.code = res.code;
                                     This.is_finish = res.is_finish;
                                     This.is_full = res.is_full;
                                     This.friends_list = res.friends_list;
                                     This.name = res.name;
+                                    /*if(This.is_finish){
+                                        this.showDialog('您今天已抢够3次，欢迎明天再来');
+                                        return;
+                                    }
+                                    if(This.is_full){
+                                        this.showDialog('每⼈每天⾄多只能得到0.3克');
+                                        return;
+                                    }*/
                                 } else {     //不正常                                    
                                     This.showDialog(res.msg);
                                 }

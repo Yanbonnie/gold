@@ -227,6 +227,25 @@ body{
     }
 }
 
+.ewm{
+    .coverBox{
+        height: auto;
+        padding-top: REM(50);
+        top: 50%;
+        @include prefixer(transform, translateY(-50%));
+        margin-top: 0;
+        img{
+            width: 80%;
+            margin: 0 auto;
+            max-width: 200px;
+        }
+        p{
+            line-height: REM(100);
+            text-align: center;
+            font-size: REM(30);
+        }
+    }
+}
 .sign_page_scrollBody::-webkit-scrollbar-track
 {
     -webkit-box-shadow: inset 0 0 0px #fff;
