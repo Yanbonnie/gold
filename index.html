@@ -53,6 +53,25 @@
                 </div>
             </div>
         </div>
+        <!--活动规则-->
+        <div class="cover rule" v-show="alertModel.rule" @click="alertModel.rule = false">
+            <div class="coverBox">
+                <span class="close" @click=""alertModel.rule = false"><img src="images/close.png" alt=""></span>
+                <h3>游戏规则</h3>
+                <ul>
+                    <li>1、每个微信账号每天有3次抢黄金机会。</li>
+                    <li>2、可以邀请好友帮抢黄金，每个好友微信账号有1次帮抢黄金机会。</li>
+                    <li></li>
+                </ul>
+                <h3>兑换规则：</h3>
+                <ul>
+                    <li>1、请持参与游戏的手机至煌明煌珠宝店，出示手机并登记后进行兑换。</li>
+                    <li>2、每人仅限1次兑换机会，兑换后不可更改、不兑换现金。</li>
+                    <li>3、兑换截止日期：2018年2月14日，逾期作废。</li>
+                </ul>
+                <p>最终解释权归煌明煌珠宝所有</p>
+            </div>
+        </div>
         <!--二维码-->
         <div class="cover ewm" v-show="alertModel.ewm" @click="alertModel.ewm = false">
             <div class="coverBox">
@@ -122,6 +141,7 @@
                         ewm:false,
                         gift:false,
                         share:false,
+                        rule:false
                     },
                     mySelfNum:3,                     //3我要抢黄金，1继续抢黄金
                     type:type,                       //页面类型 1-为自己抢 2-好友助力
@@ -264,8 +284,22 @@
                         this.alertModel.dialog = true;
                         this.alertModel.dialogTxt = msg;
                     },
+                    setSData:function(key, value){
+                        localStorage.setItem(key, JSON.stringify(value));
+                    },
+                    getSData:function(key){
+                        if(localStorage.getItem(key) === "undefined"){
+                            return '';
+                        }else{
+                            return JSON.parse(localStorage.getItem(key));
+                        }
+                    },
                 },
                 mounted: function () {
+                    if(!this.getSData('rule')){
+                        this.alertModel.rule = true;
+                        this.setSData('rule','rule');
+                    }
                     this.getUserInfo();
                 }
             })
