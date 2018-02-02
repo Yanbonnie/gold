@@ -46,6 +46,7 @@
         <!--兑换-->
         <div class="cover gift" v-show="alertModel.gift">
             <div class="coverBox">
+                <input type="text" placeholder="请输入手机号码" v-model="phone">  
                 <input type="password" placeholder="请输入兑换密码" v-model="password">  
                 <div class="btn-box">
                     <span @click="alertModel.gift = false; password = ''">取消</span>
@@ -153,6 +154,7 @@
                     is_full:0,                       //今天是否抢够0.3g,0-否  1-是  （为1时，提示用户每天每人至多只能得到0.3g）
                     friends_list:null,               //好友助力列表数据
                     name:'',                         //好友名字
+                    phone:'',                        //手机号码
                     password:'',                     //兑换密码
                     linkHref:{
                         userinfo:'http://wx.xhwxpos.com/hmhchain/index.php? m=Wap&c=Index&a=ajax_get_userinfo',   //获取用户状态信息(get)
@@ -161,8 +163,23 @@
                     }
                 },
                 methods: {
+                    //手机号码正则验证
+                    isPhone : function(str) {
+                        if(typeof str === 'number'){
+                            str = str.toString();
+                        }
+                        return /^0?1[3|4|5|7|8][0-9]\d{8}$/.test(str);
+                    },
                     //兑换
                     exchangeHandle:function(){
+                        if(!this.phone){
+                            this.showDialog('手机号码不能为空');
+                            return false;
+                        }
+                        if(!this.isPhone(this.phone)){
+                            this.showDialog('手机号码格式不正确');
+                            return false;
+                        }
                         if(!this.password){
                             this.showDialog('密码不能为空!');
                             return;

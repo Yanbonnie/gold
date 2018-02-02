@@ -175,7 +175,7 @@ body{
         left: 50%;
         top: 50%;
         margin-top:REMTWO(300);
-        height: REM(230);
+        height: REM(300);
         margin-left: REMTWO(600);
         padding: REM(80) 0 0;
         position: relative;
@@ -188,6 +188,7 @@ body{
             border: 1px #eeeeee solid;
             text-indent: 10px;
             font-size:REM(28);
+            margin-bottom:REM(20);
         }
         .btn-box{
             width: 100%;
